@@ -1,23 +1,24 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Header from './Components/User/Home/Header';
-import Footer from './Components/User/Home/Footer';
-import HomePage from './Pages/User/HomePage/HomePage';
 import LoginPage from './Components/User/Login/LoginUser';
 import SignUpPage from './Components/User/Signup/Signup';
 import OTPVerification from './Pages/User/Signup/OTPVerification';
+import ForgotPassword from './Components/User/Login/ForgotPassword';
+import ResetPassword from './Components/User/Login/ResetPassword';
+import UserRoute from './Routes/UserRoute/UserRoute';
+
 function App() {
   return (
-    <Router>
+    <Router> {/* Only one Router in the App */}
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-        <Header />
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/*" element={<UserRoute />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path='/signUp' element={<SignUpPage/>}/>
-          <Route path='/otp-verification' element={<OTPVerification/>}/>
+          <Route path="/signUp" element={<SignUpPage />} />
+          <Route path="/otp-verification" element={<OTPVerification />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:uidb64/:token" element={<ResetPassword />} />
         </Routes>
-        <Footer />
       </div>
     </Router>
   );

@@ -78,6 +78,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../../Features/Authentication/Authslice';
+import LoginImage from '../../../assets/images/login.jpg';
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -121,11 +122,11 @@ const handleLogin = async (formData) => {
     <div className="flex min-h-screen">
       {/* Left side - Illustration */}
       <div className="hidden lg:flex lg:w-1/2 bg-gray-50 items-center justify-center p-12">
-        <div className="w-96 h-96 bg-blue-900 rounded-full flex items-center justify-center">
+        <div className="w-[500px] h-[500px] rounded-full flex items-center justify-center">
           <img
-            src="/placeholder.svg?height=300&width=300"
+            src={LoginImage}
             alt="Astronomy illustration"
-            className="w-full h-full object-contain p-8"
+            className="w-full h-full object-contain p-8 rounded-full"
           />
         </div>
       </div>

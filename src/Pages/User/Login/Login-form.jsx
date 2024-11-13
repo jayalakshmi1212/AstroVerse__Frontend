@@ -41,9 +41,9 @@ function LoginForm({ onSubmit = () => {}, redirectUrl = '/', errorMessage, setEr
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       {/* Top Banner */}
-      <div className="absolute top-0 left-0 right-0 bg-indigo-600 text-white text-center py-2 text-sm">
+      {/* <div className="absolute top-0 left-0 right-0 bg-indigo-600 text-white text-center py-2 text-sm">
         Free Courses! 🌟 Early birds Save 10% | Hurry!
-      </div>
+      </div> */}
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
@@ -132,7 +132,7 @@ function LoginForm({ onSubmit = () => {}, redirectUrl = '/', errorMessage, setEr
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#1D2951] hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
               >
                 Login
               </button>
