@@ -99,24 +99,30 @@ function LoginPage() {
   };
 
 
-const handleLogin = async (formData) => {
-  try {
-    const response = await loginApi(formData); // Call your login API here
-
-    if (response && response.access) {
-      // Dispatch setUser with both user data and access token
-      dispatch(setUser({ user: response.user, accessToken: response.access }));
-
-      // Navigate to home or dashboard
-      navigate('/');
-    } else {
-      setError('Invalid credentials, please try again.');
+  const handleLogin = async (formData) => {
+    try {
+      const response = await loginApi(formData); // Call your login API here
+  
+      if (response && response.access) {
+        // Dispatch setUser with both user data and access token
+        dispatch(setUser({ user: response.user, accessToken: response.access }));
+  
+        // Navigate based on the user's role
+        if (response.user.role === 'tutor') {
+          navigate('/tutor-home'); // Redirect to tutor home
+        } else if (response.user.role === 'user') {
+          navigate('/'); // Redirect to student home or default home page
+        } else {
+          setError('Unknown user role. Please contact support.');
+        }
+      } else {
+        setError('Invalid credentials, please try again.');
+      }
+    } catch (err) {
+      setError('An error occurred. Please try again.');
     }
-  } catch (err) {
-    setError('An error occurred. Please try again.');
-  }
-};
-
+  };
+  
 
   return (
     <div className="flex min-h-screen">

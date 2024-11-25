@@ -1,8 +1,8 @@
-import React from 'react';
-import { Route, Routes } from 'react-router-dom';
-import Header from '../../Components/User/Home/Header';
-import HomePage from '../../Pages/User/HomePage/HomePage';
-import Footer from '../../Components/User/Home/Footer';
+import React from "react";
+import { Route, Routes } from "react-router-dom";
+import Header from "../../Components/User/Home/Header";
+import HomePage from "../../Pages/User/HomePage/HomePage";
+import Footer from "../../Components/User/Home/Footer";
 
 function UserRoute() {
   return (
