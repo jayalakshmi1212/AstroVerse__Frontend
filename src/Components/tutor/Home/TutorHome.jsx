@@ -1,46 +1,100 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { Star, Menu } from 'lucide-react';
-import LogoutButton from '../../User/Login/LogoutButton';
+import { Book, Users, Bell, ChevronRight } from 'lucide-react';
+import Header from './Header';
+function TutorHome() {
+  const user = useSelector((state) => state.auth.user);
 
+  const recentCourses = [
+    { id: 1, title: 'Introduction to Astrophysics', students: 25, lastUpdated: '2023-06-15' },
+    { id: 2, title: 'Planetary Science', students: 18, lastUpdated: '2023-06-10' },
+    { id: 3, title: 'Stellar Evolution', students: 30, lastUpdated: '2023-06-05' },
+  ];
 
-function Header() {
-  const user = useSelector((state) => state.auth.user); // Get user from Redux state
- 
+  const upcomingClasses = [
+    { id: 1, title: 'Black Holes and Neutron Stars', date: '2023-06-20', time: '14:00' },
+    { id: 2, title: 'Galaxies and Cosmology', date: '2023-06-22', time: '15:30' },
+  ];
+
   return (
-    <header className="bg-white dark:bg-gray-800 shadow-md">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Link to="/" className="flex items-center space-x-2">
-          <Star className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
-          <span className="text-xl font-bold text-gray-800 dark:text-white">AstroVerse</span>
-        </Link>
-        <nav className="hidden md:flex space-x-4">
-          <Link to="/courses" className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Courses</Link>
-          <Link to="/about" className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">About</Link>
-          <Link to="/contact" className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Contact</Link>
-        </nav>
-        <div className="flex items-center space-x-4">
-          {user ? (
-            <>
-              <span className="text-gray-600 dark:text-gray-300">{`Welcome, ${user.username}`}</span>
-              
-            </>
-          ) : (
-            <Link to="/login" className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
-              Sign In
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+      <main className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-8">Welcome back, {user?.username}!</h1>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <section className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Recent Courses</h2>
+            <ul className="space-y-4">
+              {recentCourses.map((course) => (
+                <li key={course.id} className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-medium text-gray-800 dark:text-white">{course.title}</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{course.students} students • Last updated: {course.lastUpdated}</p>
+                  </div>
+                  <Link to={`/course/${course.id}`} className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
+                    <ChevronRight className="h-5 w-5" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <Link to="/courses" className="mt-4 inline-block text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
+              View all courses
             </Link>
-          )}
-          <LogoutButton className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
-                Logout
-              </LogoutButton>
+          </section>
+
+          <section className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Upcoming Classes</h2>
+            <ul className="space-y-4">
+              {upcomingClasses.map((class_) => (
+                <li key={class_.id} className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-medium text-gray-800 dark:text-white">{class_.title}</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{class_.date} at {class_.time}</p>
+                  </div>
+                  <Link to={`/class/${class_.id}`} className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
+                    <ChevronRight className="h-5 w-5" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <Link to="/schedule" className="mt-4 inline-block text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
+              View full schedule
+            </Link>
+          </section>
         </div>
-        <button className="md:hidden">
-          <Menu className="h-6 w-6 text-gray-600 dark:text-gray-300" />
-        </button>
-      </div>
-    </header>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+          <Link to="/tutor/mycourse" className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-150 ease-in-out">
+            <div className="flex items-center">
+              <Book className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mr-3" />
+              <span className="text-lg font-medium text-gray-800 dark:text-white">My Courses</span>
+            </div>
+            <ChevronRight className="h-5 w-5 text-gray-400" />
+          </Link>
+
+          <Link to="/students" className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-150 ease-in-out">
+            <div className="flex items-center">
+              <Users className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mr-3" />
+              <span className="text-lg font-medium text-gray-800 dark:text-white">Students</span>
+            </div>
+            <ChevronRight className="h-5 w-5 text-gray-400" />
+          </Link>
+
+          <Link to="/notifications" className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-150 ease-in-out">
+            <div className="flex items-center">
+              <Bell className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mr-3" />
+              <span className="text-lg font-medium text-gray-800 dark:text-white">Notifications</span>
+            </div>
+            <ChevronRight className="h-5 w-5 text-gray-400" />
+          </Link>
+        </div>
+      </main>
+    </div>
   );
 }
 
-export default Header;
+export default TutorHome;
+
+

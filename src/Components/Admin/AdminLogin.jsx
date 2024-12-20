@@ -85,7 +85,8 @@ function AdminLogin() {
       if (response.ok) {
         setMessage(`Welcome, ${data.user.email}`);
         localStorage.setItem('user', JSON.stringify(data.user));
-        navigate('/admindashboard'); // Navigate to AdminDashboard
+        
+        navigate('/admin/admindashboard'); // Navigate to AdminDashboard
       } else {
         setMessage(data.error || 'Login failed');
       }

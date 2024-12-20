@@ -113,48 +113,70 @@
 // };
 
 // export default TutorSignup;
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import uploadImageToCloudinary from "../../utils/cloudinary";
 
 const TutorSignup = () => {
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    phoneNumber: ''
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phoneNumber: "",
+    document_tutor: "",
   });
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  const handleChange = async (e) => {
+    const { name, files} = e.target;
+    if (name == "document") {
+      console.log(name,"----------------",files)
+      try {
+        const uploadedUrl = await uploadImageToCloudinary(files[0]);
+        console.log(uploadedUrl,"iu9dnhiudfjhidfjhidf")
+        setFormData({
+          ...formData,
+          document_tutor: uploadedUrl.url,
+        });
+      } catch (error) {
+        setMessage("Failed to upload the document.");
+      }
+    } else {
+      setFormData({
+        ...formData,
+        [name]: e.target.value,
+      });
+    }
   };
-
+  
+  console.log(formData.document_tutor,'from frontend')
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
-      setMessage('Passwords do not match');
+      setMessage("Passwords do not match");
       return;
     }
-
     try {
-      const response = await axios.post('http://localhost:8000/signup/tutor/', {
+      const response = await axios.post("http://localhost:8000/signup/tutor/", {
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        phone_number: formData.phoneNumber
+        phone_number: formData.phoneNumber,
+        document_tutor:formData.document_tutor
       });
-      
+
       setMessage(response.data.message);
-      if (response.data.redirect_to) {
-        navigate('/tutor-otp', { state: { email: formData.email } });
+      if (response.data.redirect_to ) {
+        navigate("/tutor-otp", { state: { email: formData.email } });
       }
     } catch (error) {
-      setMessage('Error: ' + (error.response?.data?.detail || 'Unable to sign up.'));
+      setMessage(
+        "Error: " + (error.response?.data?.detail || "Unable to sign up.")
+      );
     }
   };
 
@@ -171,9 +193,9 @@ const TutorSignup = () => {
             <h2 className="text-3xl font-bold text-gray-900">Welcome</h2>
             <p className="text-gray-500">Create your tutor account</p>
           </div>
-          <img 
-            src="/placeholder.svg?height=100&width=100" 
-            alt="Welcome illustration" 
+          <img
+            src="/placeholder.svg?height=100&width=100"
+            alt="Welcome illustration"
             className="w-24 h-24 rounded-full"
           />
         </div>
@@ -185,44 +207,25 @@ const TutorSignup = () => {
         )}
 
         <div className="space-y-4">
-          <button
-            onClick={() => handleSocialLogin('google')}
-            className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            <img
-              className="h-5 w-5 mr-2"
-              src="/placeholder.svg?height=20&width=20"
-              alt="Google logo"
-            />
-            Continue with Google
-          </button>
+          
 
-          <button
-            onClick={() => handleSocialLogin('facebook')}
-            className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            <img
-              className="h-5 w-5 mr-2"
-              src="/placeholder.svg?height=20&width=20"
-              alt="Facebook logo"
-            />
-            Continue with Facebook
-          </button>
+         
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300" />
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-50 text-gray-500">Or continue with</span>
-            </div>
+           
           </div>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSignupSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Username
               </label>
               <input
@@ -237,7 +240,10 @@ const TutorSignup = () => {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Email address
               </label>
               <input
@@ -252,7 +258,10 @@ const TutorSignup = () => {
             </div>
 
             <div>
-              <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="phoneNumber"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Phone Number
               </label>
               <input
@@ -267,7 +276,10 @@ const TutorSignup = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Password
               </label>
               <input
@@ -282,7 +294,10 @@ const TutorSignup = () => {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Confirm Password
               </label>
               <input
@@ -291,6 +306,23 @@ const TutorSignup = () => {
                 type="password"
                 required
                 value={formData.confirmPassword}
+                onChange={handleChange}
+                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="document"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Upload document
+              </label>
+              <input
+                id="document"
+                name="document"
+                type="file"
+                required
+                accept="application/pdf" // Ensures only PDFs can be selected
                 onChange={handleChange}
                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
               />
@@ -308,8 +340,11 @@ const TutorSignup = () => {
         </form>
 
         <p className="mt-2 text-center text-sm text-gray-600">
-          Already have an account?{' '}
-          <a href="/login" className="font-medium text-purple-600 hover:text-purple-500">
+          Already have an account?{" "}
+          <a
+            href="/login"
+            className="font-medium text-purple-600 hover:text-purple-500"
+          >
             Sign in
           </a>
         </p>
@@ -319,4 +354,3 @@ const TutorSignup = () => {
 };
 
 export default TutorSignup;
-

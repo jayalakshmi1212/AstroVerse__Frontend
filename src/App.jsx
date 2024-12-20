@@ -12,6 +12,14 @@ import OTPVerificationTutor from "./Pages/tutor/SignupTutor/OtpVerificationTutor
 import AdminLogin from "./Pages/Admin/adminLogin";
 import Login from "./Components/Admin/AdminLogin";
 import AdminDashboard from "./Pages/Admin/AdminDashboard";
+import CategoryManagement from "./Pages/Admin/Category/CategoryManagement";
+import UserList from "./Components/Admin/List/UserList"; 
+import TutorList from "./Components/Admin/List/TutorList";
+import AddCourseForm from "./Components/tutor/CourseManagement/CourseManagement";
+import CourseList from "./Components/tutor/CourseManagement/CourseList";
+import TutorRoute from "./Routes/TutorRoute/TutorRoute";
+import AdminRoute from "./Routes/AdminRoute/AdminRoute";
+import LandingPage from "./Components/landingpage";
 
 function App() {
   return (
@@ -29,12 +37,13 @@ function App() {
             path="/reset-password/:uidb64/:token"
             element={<ResetPassword />}
           />
-          <Route path="/signup/tutor" element={<TutorSignup />} />
-          <Route path="/tutor-home" element={<TutorHome />} />
-          <Route path="/tutor-otp" element={<OTPVerificationTutor />} />
-          <Route path="/admin" element={<AdminLogin />} />
-          <Route path="/adminlogin" element={<Login/>} />
-          <Route path="/admindashboard" element={<AdminDashboard/>} />
+          <Route path="/tutor/*" element={<TutorRoute/>} />
+
+          <Route path="/admin/*" element={<AdminRoute/>}/>
+         
+          <Route path="/" element={<LandingPage />} />
+          
+
         
         </Routes>
       </div>

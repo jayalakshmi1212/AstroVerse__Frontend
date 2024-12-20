@@ -71,7 +71,6 @@
 
 // export default LoginPage;
 
-
 import React, { useState } from 'react';
 import LoginForm from '../../../Pages/User/Login/Login-form';
 import { useNavigate } from 'react-router-dom';
@@ -88,41 +87,51 @@ function LoginPage() {
   const loginApi = async (formData) => {
     try {
       const response = await axios.post('http://localhost:8000/login/', formData);
+      console.log('Login API Response:', response.data);
+
       if (response.data.access && response.data.refresh) {
-        return response.data;
+        return response.data; // Return the full response data
       } else {
-        throw new Error('Invalid credentials');
+        throw new Error('Invalid credentials'); // API did not return the expected tokens
       }
     } catch (err) {
-      throw err;
+      console.error('Login API Error:', err.response?.data || err.message);
+      throw err; // Rethrow the error for further handling
     }
   };
-
 
   const handleLogin = async (formData) => {
     try {
-      const response = await loginApi(formData); // Call your login API here
-  
-      if (response && response.access) {
-        // Dispatch setUser with both user data and access token
-        dispatch(setUser({ user: response.user, accessToken: response.access }));
-  
+      const response = await loginApi(formData);
+
+      if (response) {
+        // Save tokens to sessionStorage
+        sessionStorage.setItem('accessToken', response.access);
+        sessionStorage.setItem('refreshToken', response.refresh);
+
+        // Dispatch setUser with user data, accessToken, and refreshToken
+        dispatch(
+          setUser({
+            user: response.user,
+            accessToken: response.access,
+            refreshToken: response.refresh,
+            role: response.user.role,
+          })
+        );
+
         // Navigate based on the user's role
         if (response.user.role === 'tutor') {
-          navigate('/tutor-home'); // Redirect to tutor home
+          navigate('/tutor/tutor-home');
         } else if (response.user.role === 'user') {
-          navigate('/'); // Redirect to student home or default home page
+          navigate('/');
         } else {
           setError('Unknown user role. Please contact support.');
         }
-      } else {
-        setError('Invalid credentials, please try again.');
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setError(err.response?.data?.detail || 'An error occurred. Please try again.');
     }
   };
-  
 
   return (
     <div className="flex min-h-screen">
@@ -131,7 +140,7 @@ function LoginPage() {
         <div className="w-[500px] h-[500px] rounded-full flex items-center justify-center">
           <img
             src={LoginImage}
-            alt="Astronomy illustration"
+            alt="Login illustration"
             className="w-full h-full object-contain p-8 rounded-full"
           />
         </div>
@@ -140,7 +149,7 @@ function LoginPage() {
       {/* Right side - Login Form */}
       <div className="w-full lg:w-1/2">
         <LoginForm onSubmit={handleLogin} setError={setError} />
-        {error && <p className="text-red-500">{error}</p>}
+        {error && <p className="text-red-500 mt-4">{error}</p>}
       </div>
     </div>
   );

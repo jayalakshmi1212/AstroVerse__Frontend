@@ -287,6 +287,8 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import astronomyImage from '../../../assets/images/astronomy-kids-cartoon.avif'
+import { Star} from 'lucide-react';
 
 export default function Component() {
   const [formData, setFormData] = useState({
@@ -396,12 +398,12 @@ export default function Component() {
       <div className="w-full md:w-1/2 flex flex-col p-8">
         <div className="mb-8">
           <div className="flex items-center gap-2">
-            <div className="bg-[#1D2951] p-2 rounded">
-              <span className="text-white text-2xl font-bold">A</span>
-            </div>
+            
             <div>
-              <h1 className="text-xl font-bold text-[#1D2951]">Astro Dashboard</h1>
-              <p className="text-sm text-gray-600">An Accessible Astro Theme</p>
+            <Link to="/" className="flex items-center space-x-2">
+          <Star className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+          <span className="text-xl font-bold text-gray-800 dark:text-white">AstroVerse</span>
+        </Link>
             </div>
           </div>
         </div>
@@ -546,10 +548,10 @@ export default function Component() {
         </form>
       </div>
 
-      <div className="hidden md:block md:w-1/2 bg-[#1D2951]">
+      <div className="hidden md:block md:w-1/2 bg-[rgb(245,246,247)]">
         <div className="h-full flex items-center justify-center p-8">
           <img
-            src="/placeholder.svg?height=400&width=400"
+            src={astronomyImage}
             alt="Astronaut sitting on crescent moon"
             className="max-w-full h-auto rounded-lg"
           />

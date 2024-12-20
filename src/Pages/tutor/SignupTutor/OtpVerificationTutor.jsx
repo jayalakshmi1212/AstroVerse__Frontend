@@ -80,8 +80,9 @@ export default function OTPVerificationTutor() {
 
     try {
       const response = await axios.post('http://127.0.0.1:8000/verify-otp/', { email, otp: values.otp });
-
+      
       if (response.status === 200) {
+        console.log(response,'kitiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii')
         navigate('/tutor-home');
       }
     } catch (error) {
