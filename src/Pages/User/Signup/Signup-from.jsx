@@ -310,33 +310,43 @@ export default function Component() {
   const navigate = useNavigate()
 
   const validateForm = () => {
-    const newErrors = {}
-    
+    const newErrors = {};
+  
+    // Full Name validation: only alphabetic characters allowed
     if (!formData.fullName.trim()) {
-      newErrors.fullName = 'Full name is required'
+      newErrors.fullName = 'Full name is required';
+    } else if (!/^[A-Za-z\s]+$/.test(formData.fullName)) {
+      newErrors.fullName = 'Full name must contain only letters';
     }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  
+    // Email validation: standard email regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address'
+      newErrors.email = 'Please enter a valid email address';
     }
-
-    if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters long'
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match'
-    }
-
-    const phoneRegex = /^\+?[\d\s-]{10,}$/
+  
+    // Phone Number validation: exactly 10 digits and not all the same digit
+    const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(formData.phoneNumber)) {
-      newErrors.phoneNumber = 'Please enter a valid phone number'
+      newErrors.phoneNumber = 'Phone number must be exactly 10 digits';
+    } else if (/^(\d)\1+$/.test(formData.phoneNumber)) {
+      newErrors.phoneNumber = 'Phone number cannot be all the same digit';
     }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+  
+    // Password validation: at least 8 characters
+    if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters long';
+    }
+  
+    // Confirm Password validation: must match password
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+  
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target

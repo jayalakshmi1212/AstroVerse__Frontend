@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "../../../utils/axiosInstance";
 import uploadImageToCloudinary from "../../../utils/cloudinary";
-import {useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useSelector } from 'react-redux';
+import { MessageSquare, ChevronRight } from 'lucide-react';
+import CommentModal from '../../Utils/comment-modal';
 
 const CourseDetails = () => {
-  const navigate=useNavigate()
+  const navigate = useNavigate();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -13,13 +16,28 @@ const CourseDetails = () => {
     video: null,
     description: "",
   });
+  const [lessonComments, setLessonComments] = useState({});
+  const [activeCommentModal, setActiveCommentModal] = useState(null);
   const { id } = useParams();
+  const accessToken = useSelector((state) => state.auth.accessToken);
+  const userId = useSelector((state) => state.auth.user.id);
 
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/coursedetail/${id}/`);
         setCourse(response.data);
+        
+        // Fetch comments for each lesson
+        const commentsPromises = response.data.lessons.map(lesson =>
+          axios.get(`http://localhost:8000/lessons/${lesson.id}/comments/`)
+        );
+        const commentsResponses = await Promise.all(commentsPromises);
+        const newLessonComments = {};
+        commentsResponses.forEach((response, index) => {
+          newLessonComments[response.data.lessons[index].id] = response.data;
+        });
+        setLessonComments(newLessonComments);
       } catch (error) {
         console.error("Failed to fetch course details:", error);
       }
@@ -34,8 +52,7 @@ const CourseDetails = () => {
     if (window.confirm("Are you sure you want to delete this course?")) {
       try {
         await axios.delete(`http://localhost:8000/coursedetail/${id}/`);
-        navigate('/tutor/courselist')
-        // Redirect to courses list or handle as needed
+        navigate('/tutor/courselist');
       } catch (error) {
         console.error("Failed to delete course:", error);
         alert("Failed to delete course. Please try again.");
@@ -74,7 +91,31 @@ const CourseDetails = () => {
       setLoading(false);
     }
   };
-  
+
+  const handleAddComment = async (lessonId, content, parentId = null) => {
+    if (content.trim() === '') {
+      console.warn('Cannot add an empty comment');
+      return;
+    }
+
+    try {
+      await axios.post(
+        `http://localhost:8000/lessons/${lessonId}/comments/`,
+        { content, user: userId, lesson: lessonId, parent: parentId },
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      );
+
+      const updatedComments = await axios.get(
+        `http://localhost:8000/lessons/${lessonId}/comments/`
+      );
+      setLessonComments(prev => ({
+        ...prev,
+        [lessonId]: updatedComments.data || []
+      }));
+    } catch (error) {
+      console.error('Error adding comment or reply:', error);
+    }
+  };
 
   if (!id) {
     return (
@@ -135,8 +176,20 @@ const CourseDetails = () => {
               <div key={lesson.id} className="bg-gray-50 p-4 rounded-lg shadow">
                 <h3 className="text-xl font-semibold mb-2">{lesson.title}</h3>
                 <p className="text-gray-600 mb-4">{lesson.description}</p>
-                <video src={lesson.video_url} controls className="w-full rounded-lg" />
-
+                <video src={lesson.video_url} controls className="w-full rounded-lg mb-4" />
+                <button
+                  onClick={() => setActiveCommentModal(lesson.id)}
+                  className="flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+                >
+                  <MessageSquare className="w-5 h-5" />
+                  <span>Comments ({lessonComments[lesson.id]?.length || 0})</span>
+                </button>
+                <CommentModal
+                  isOpen={activeCommentModal === lesson.id}
+                  onClose={() => setActiveCommentModal(null)}
+                  comments={lessonComments[lesson.id] || []}
+                  onAddComment={(content) => handleAddComment(lesson.id, content)}
+                />
               </div>
             ))}
           </div>
@@ -169,7 +222,6 @@ const CourseDetails = () => {
                   type="file"
                   accept="video/*"
                   onChange={(e) => setLessonData({ ...lessonData, video: e.target.files[0] })}
-                  
                   className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />

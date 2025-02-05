@@ -9,6 +9,7 @@ import CourseDetails from "../../Components/tutor/CourseManagement/CourseDetails
 import Header from "../../Components/tutor/Home/Header";
 import CourseManagement from "../../Components/tutor/MyCourse";
 import TutorProfile from "../../Components/tutor/Profile/TutorProfile";
+import TutorReviewsPage from "../../Components/tutor/CourseManagement/ReviewCourse";
 import {PrivateRoute} from "../PrivateRoute";
 function TutorRoute() {
   return (
@@ -31,6 +32,7 @@ function TutorRoute() {
         <Route path="/coursedetail/:id" element={<CourseDetails />} />
         <Route path="/mycourse" element={<CourseManagement/>} />
         <Route path="/tutorprofile" element={<TutorProfile/>}/>
+        <Route path="/reviews" element={<TutorReviewsPage />} />
 
       </Routes>
     </div>

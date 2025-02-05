@@ -6,20 +6,11 @@ import OTPVerification from "./Pages/User/Signup/OTPVerification";
 import ForgotPassword from "./Components/User/Login/ForgotPassword";
 import ResetPassword from "./Components/User/Login/ResetPassword";
 import UserRoute from "./Routes/UserRoute/UserRoute";
-import TutorSignup from "./Components/tutor/TutorSignUpPage";
-import TutorHome from "./Components/tutor/Home/TutorHome";
-import OTPVerificationTutor from "./Pages/tutor/SignupTutor/OtpVerificationTutor";
-import AdminLogin from "./Pages/Admin/adminLogin";
-import Login from "./Components/Admin/AdminLogin";
-import AdminDashboard from "./Pages/Admin/AdminDashboard";
-import CategoryManagement from "./Pages/Admin/Category/CategoryManagement";
-import UserList from "./Components/Admin/List/UserList"; 
-import TutorList from "./Components/Admin/List/TutorList";
-import AddCourseForm from "./Components/tutor/CourseManagement/CourseManagement";
-import CourseList from "./Components/tutor/CourseManagement/CourseList";
 import TutorRoute from "./Routes/TutorRoute/TutorRoute";
 import AdminRoute from "./Routes/AdminRoute/AdminRoute";
 import LandingPage from "./Components/landingpage";
+import ChatComponent from "./Components/User/Chat/Chat";
+import ChatListComponent from "./Components/User/Chat/ChatListComponent";
 
 function App() {
   return (
@@ -40,9 +31,12 @@ function App() {
           <Route path="/tutor/*" element={<TutorRoute/>} />
 
           <Route path="/admin/*" element={<AdminRoute/>}/>
-         
-          <Route path="/" element={<LandingPage />} />
           
+         
+          {/* <Route path="/" element={<LandingPage />} /> */}
+          
+          <Route path="/chat/:senderId/:recipientId" element={<ChatComponent />} />
+          <Route path="/chats" element={<ChatListComponent />} />
 
         
         </Routes>

@@ -1,14 +1,15 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Sidebar = ({ profileImage, username }) => {
   const menuItems = [
-    { label: 'Profile', active: true },
-    { label: 'Work Opportunities' },
-    { label: 'Password' },
-    { label: 'Social Profiles' },
-    { label: 'Invitations' },
-    { label: 'Sessions' },
-    { label: 'Applications' },
+    { label: 'Profile', active: true, to: '/profile' },
+    { label: 'Chats', to: '/chats' }, // Add the route to the Chats page
+    { label: 'Password', to: '/password' },
+    { label: 'Social Profiles', to: '/social-profiles' },
+    { label: 'Invitations', to: '/invitations' },
+    { label: 'Sessions', to: '/sessions' },
+    { label: 'Applications', to: '/applications' },
   ];
 
   return (
@@ -29,8 +30,8 @@ const Sidebar = ({ profileImage, username }) => {
         <ul className="space-y-2">
           {menuItems.map((item) => (
             <li key={item.label}>
-              <a
-                href="#"
+              <Link
+                to={item.to} // Use Link to navigate
                 className={`block px-4 py-2 rounded-lg text-sm ${
                   item.active
                     ? 'text-rose-500 bg-rose-50'
@@ -38,7 +39,7 @@ const Sidebar = ({ profileImage, username }) => {
                 }`}
               >
                 {item.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>

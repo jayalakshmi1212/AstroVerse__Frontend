@@ -95,8 +95,15 @@ function LoginPage() {
         throw new Error('Invalid credentials'); // API did not return the expected tokens
       }
     } catch (err) {
-      console.error('Login API Error:', err.response?.data || err.message);
-      throw err; // Rethrow the error for further handling
+      const errorDetail = err.response?.data?.detail;
+      console.log(errorDetail)
+      if (errorDetail === 'Incorrect email') {
+        throw new Error('Incorrect email');
+      } else if (errorDetail === 'Incorrect password') {
+        throw new Error('Incorrect password');
+      } else {
+        throw new Error('An error occurred. Please try again.');
+      }
     }
   };
 
@@ -129,7 +136,7 @@ function LoginPage() {
         }
       }
     } catch (err) {
-      setError(err.response?.data?.detail || 'An error occurred. Please try again.');
+      setError(err.message); 
     }
   };
 
@@ -148,8 +155,9 @@ function LoginPage() {
 
       {/* Right side - Login Form */}
       <div className="w-full lg:w-1/2">
-        <LoginForm onSubmit={handleLogin} setError={setError} />
-        {error && <p className="text-red-500 mt-4">{error}</p>}
+      <LoginForm onSubmit={handleLogin} error={error} />
+{error && <p className="text-red-500 mt-4">{error}</p>}
+
       </div>
     </div>
   );

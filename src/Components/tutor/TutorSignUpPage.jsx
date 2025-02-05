@@ -1,188 +1,74 @@
-// import React, { useState } from 'react';
-// import axios from 'axios';
-// import { useNavigate } from 'react-router-dom';
-
-// const TutorSignup = () => {
-//   const [formData, setFormData] = useState({
-//     username: '',
-//     email: '',
-//     password: '',
-//   });
-//   const [otp, setOtp] = useState('');
-//   const [message, setMessage] = useState('');
-//   const [showOtpForm, setShowOtpForm] = useState(false);
-
-//   const navigate = useNavigate();
-
-//   const handleChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormData({ ...formData, [name]: value });
-//   };
-
-//   const handleOtpChange = (e) => {
-//     setOtp(e.target.value);
-//   };
-
-//   const handleSignupSubmit = async (e) => {
-//     e.preventDefault();
-//     try {
-//       const response = await axios.post('http://localhost:8000/signup/tutor/', formData);
-//       setMessage(response.data.message);
-//       if (response.data.redirect_to) {
-//         setShowOtpForm(true); // Show OTP form if signup is successful
-//       }
-//     } catch (error) {
-//       setMessage('Error: ' + (error.response?.data?.detail || 'Unable to sign up.'));
-//     }
-//   };
-
-//   const handleOtpSubmit = async (e) => {
-//     e.preventDefault();
-//     try {
-//       const response = await axios.post('http://localhost:8000/tutor/verify-otp/', {
-//         email: formData.email,
-//         otp: otp,
-//       });
-//       setMessage(response.data.message);
-//       if (response.data.access) {
-//         // Store tokens and redirect to the tutor home page
-//         localStorage.setItem('access_token', response.data.access);
-//         localStorage.setItem('refresh_token', response.data.refresh);
-//         navigate('/tutor-home');
-//       }
-//     } catch (error) {
-//       setMessage('Error: ' + (error.response?.data?.detail || 'Invalid OTP.'));
-//     }
-//   };
-
-//   return (
-//     <div>
-//       <h2>Tutor Signup</h2>
-//       {message && <p>{message}</p>}
-
-//       {!showOtpForm ? (
-//         <form onSubmit={handleSignupSubmit}>
-//           <div>
-//             <label>Username:</label>
-//             <input
-//               type="text"
-//               name="username"
-//               value={formData.username}
-//               onChange={handleChange}
-//               required
-//             />
-//           </div>
-//           <div>
-//             <label>Email:</label>
-//             <input
-//               type="email"
-//               name="email"
-//               value={formData.email}
-//               onChange={handleChange}
-//               required
-//             />
-//           </div>
-//           <div>
-//             <label>Password:</label>
-//             <input
-//               type="password"
-//               name="password"
-//               value={formData.password}
-//               onChange={handleChange}
-//               required
-//             />
-//           </div>
-//           <button type="submit">Sign Up</button>
-//         </form>
-//       ) : (
-//         <form onSubmit={handleOtpSubmit}>
-//           <div>
-//             <label>Enter OTP:</label>
-//             <input
-//               type="text"
-//               value={otp}
-//               onChange={handleOtpChange}
-//               required
-//             />
-//           </div>
-//           <button type="submit">Verify OTP</button>
-//         </form>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default TutorSignup;
-import React, { useState } from "react";
+import React from "react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import uploadImageToCloudinary from "../../utils/cloudinary";
 
 const TutorSignup = () => {
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    phoneNumber: "",
-    document_tutor: "",
-  });
-  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
-  const handleChange = async (e) => {
-    const { name, files} = e.target;
-    if (name == "document") {
-      console.log(name,"----------------",files)
+  // Formik setup with initial values and validation schema
+  const formik = useFormik({
+    initialValues: {
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      phoneNumber: "",
+      document_tutor: "",
+    },
+    validationSchema: Yup.object({
+      username: Yup.string()
+        .min(3, "Username must be at least 3 characters")
+        .required("Username is required"),
+      email: Yup.string()
+        .email("Invalid email format")
+        .required("Email is required"),
+      phoneNumber: Yup.string()
+        .matches(/^\d{10}$/, "Phone number must be 10 digits")
+        .required("Phone number is required"),
+      password: Yup.string()
+        .min(6, "Password must be at least 6 characters")
+        .required("Password is required"),
+      confirmPassword: Yup.string()
+        .oneOf([Yup.ref("password"), null], "Passwords must match")
+        .required("Confirm password is required"),
+    }),
+    onSubmit: async (values) => {
       try {
-        const uploadedUrl = await uploadImageToCloudinary(files[0]);
-        console.log(uploadedUrl,"iu9dnhiudfjhidfjhidf")
-        setFormData({
-          ...formData,
-          document_tutor: uploadedUrl.url,
+        const response = await axios.post("http://localhost:8000/signup/tutor/", {
+          username: values.username,
+          email: values.email,
+          password: values.password,
+          phone_number: values.phoneNumber,
+          document_tutor: values.document_tutor,
         });
+
+        if (response.data.redirect_to) {
+          navigate("/otp-verification", { state: { email: values.email } });
+        }
       } catch (error) {
-        setMessage("Failed to upload the document.");
+        formik.setErrors({
+          submit: "Unable to sign up. Please try again later.",
+        });
       }
-    } else {
-      setFormData({
-        ...formData,
-        [name]: e.target.value,
-      });
-    }
-  };
-  
-  console.log(formData.document_tutor,'from frontend')
-  const handleSignupSubmit = async (e) => {
-    e.preventDefault();
+    },
+  });
 
-    if (formData.password !== formData.confirmPassword) {
-      setMessage("Passwords do not match");
-      return;
-    }
-    try {
-      const response = await axios.post("http://localhost:8000/signup/tutor/", {
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-        phone_number: formData.phoneNumber,
-        document_tutor:formData.document_tutor
-      });
-
-      setMessage(response.data.message);
-      if (response.data.redirect_to ) {
-        navigate("/tutor-otp", { state: { email: formData.email } });
+  // Handle document upload separately
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      try {
+        const uploadedUrl = await uploadImageToCloudinary(file);
+        formik.setFieldValue("document_tutor", uploadedUrl.url);
+      } catch (error) {
+        formik.setErrors({
+          document_tutor: "Failed to upload the document",
+        });
       }
-    } catch (error) {
-      setMessage(
-        "Error: " + (error.response?.data?.detail || "Unable to sign up.")
-      );
     }
-  };
-
-  const handleSocialLogin = (provider) => {
-    // Implement social login logic here
-    console.log(`Logging in with ${provider}`);
   };
 
   return (
@@ -200,99 +86,107 @@ const TutorSignup = () => {
           />
         </div>
 
-        {message && (
+        {formik.errors.submit && (
           <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
-            {message}
+            {formik.errors.submit}
           </div>
         )}
 
-        <div className="space-y-4">
-          
-
-         
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
-            </div>
-           
-          </div>
-        </div>
-
-        <form className="mt-8 space-y-6" onSubmit={handleSignupSubmit}>
+        <form className="mt-8 space-y-6" onSubmit={formik.handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
+            {/* Username */}
             <div>
-              <label
-                htmlFor="username"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
                 Username
               </label>
               <input
                 id="username"
                 name="username"
                 type="text"
-                required
-                value={formData.username}
-                onChange={handleChange}
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.username}
+                className={`appearance-none relative block w-full px-3 py-2 border ${
+                  formik.touched.username && formik.errors.username
+                    ? "border-red-500"
+                    : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm`}
               />
+              {formik.touched.username && formik.errors.username && (
+                <p className="text-red-500 text-sm">{formik.errors.username}</p>
+              )}
             </div>
 
+            {/* Email */}
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email address
               </label>
               <input
                 id="email"
                 name="email"
                 type="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.email}
+                className={`appearance-none relative block w-full px-3 py-2 border ${
+                  formik.touched.email && formik.errors.email
+                    ? "border-red-500"
+                    : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm`}
               />
+              {formik.touched.email && formik.errors.email && (
+                <p className="text-red-500 text-sm">{formik.errors.email}</p>
+              )}
             </div>
 
+            {/* Phone Number */}
             <div>
-              <label
-                htmlFor="phoneNumber"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
                 Phone Number
               </label>
               <input
                 id="phoneNumber"
                 name="phoneNumber"
                 type="tel"
-                required
-                value={formData.phoneNumber}
-                onChange={handleChange}
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.phoneNumber}
+                className={`appearance-none relative block w-full px-3 py-2 border ${
+                  formik.touched.phoneNumber && formik.errors.phoneNumber
+                    ? "border-red-500"
+                    : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm`}
               />
+              {formik.touched.phoneNumber && formik.errors.phoneNumber && (
+                <p className="text-red-500 text-sm">{formik.errors.phoneNumber}</p>
+              )}
             </div>
 
+            {/* Password */}
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                 Password
               </label>
               <input
                 id="password"
                 name="password"
                 type="password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.password}
+                className={`appearance-none relative block w-full px-3 py-2 border ${
+                  formik.touched.password && formik.errors.password
+                    ? "border-red-500"
+                    : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm`}
               />
+              {formik.touched.password && formik.errors.password && (
+                <p className="text-red-500 text-sm">{formik.errors.password}</p>
+              )}
             </div>
 
+            {/* Confirm Password */}
             <div>
               <label
                 htmlFor="confirmPassword"
@@ -304,28 +198,36 @@ const TutorSignup = () => {
                 id="confirmPassword"
                 name="confirmPassword"
                 type="password"
-                required
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.confirmPassword}
+                className={`appearance-none relative block w-full px-3 py-2 border ${
+                  formik.touched.confirmPassword && formik.errors.confirmPassword
+                    ? "border-red-500"
+                    : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm`}
               />
+              {formik.touched.confirmPassword && formik.errors.confirmPassword && (
+                <p className="text-red-500 text-sm">{formik.errors.confirmPassword}</p>
+              )}
             </div>
+
+            {/* Document Upload */}
             <div>
-              <label
-                htmlFor="document"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="document" className="block text-sm font-medium text-gray-700">
                 Upload document
               </label>
               <input
                 id="document"
                 name="document"
                 type="file"
-                required
-                accept="application/pdf" // Ensures only PDFs can be selected
-                onChange={handleChange}
+                accept="application/pdf"
+                onChange={handleFileChange}
                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
               />
+              {formik.errors.document_tutor && (
+                <p className="text-red-500 text-sm">{formik.errors.document_tutor}</p>
+              )}
             </div>
           </div>
 

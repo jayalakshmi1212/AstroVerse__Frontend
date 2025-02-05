@@ -1,25 +1,29 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "../../../utils/axiosInstance";
-import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+
 const CourseDetail = () => {
   const { id } = useParams();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isEnrolled, setIsEnrolled] = useState(false); 
-  const navigate=useNavigate()
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const navigate = useNavigate();
+  const userId = useSelector((state) => state.auth.user.id);
+  const tutorId = course?.created_by;
+
+
   useEffect(() => {
     const fetchCourse = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/courses/${id}/`);
         setCourse(response.data);
-              // Check if the user is already enrolled
-              const enrollmentResponse = await axios.get(`http://localhost:8000/enrollment-status/${id}/`, {
-                headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` },
-              });
-              setIsEnrolled(enrollmentResponse.data.is_enrolled);
+        console.log(response.data);
+        const enrollmentResponse = await axios.get(`http://localhost:8000/enrollment-status/${id}/`, {
+          headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` },
+        });
+        setIsEnrolled(enrollmentResponse.data.is_enrolled);
       } catch (error) {
         console.error("Error fetching course details:", error);
       } finally {
@@ -29,24 +33,20 @@ const CourseDetail = () => {
 
     fetchCourse();
   }, [id]);
+
   const handlePayment = async () => {
     try {
-      // // Check if the user is signed in
-      // const token = sessionStorage.getItem("token") || localStorage.getItem("token");
-      // if (!token) {
-      //   alert("Please log in to enroll in this course.");
-      //   navigate("/login");
-      //   return;
-      // }
       const amount = course.price * 100; // Convert to paise
       const response = await axios.post("http://localhost:8000/initiate-payment/", {
-        amount: amount,timeout:5000,
+        amount: amount
+      }, {
+        timeout: 5000,
       });
-  
+
       const { id: order_id, currency, amount: order_amount } = response.data;
-  
+
       const options = {
-        key: "rzp_test_fGwLaAdAhjOjbm", // Replace with your Razorpay Key ID
+        key: "rzp_test_fGwLaAdAhjOjbm",
         amount: order_amount,
         currency: currency,
         name: "Your Platform Name",
@@ -60,11 +60,11 @@ const CourseDetail = () => {
                 payment_id: response.razorpay_payment_id,
                 course_id: course.id,
               },
-              { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } } // Assuming JWT auth
+              { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
             );
-  
+
             toast.success("Payment successful and enrollment confirmed!");
-            setIsEnrolled(true); 
+            setIsEnrolled(true);
             console.log(paymentResponse.data);
           } catch (err) {
             console.error("Error saving enrollment:", err);
@@ -72,22 +72,26 @@ const CourseDetail = () => {
           }
         },
         prefill: {
-          name: "User Name", // Replace with the logged-in user's name
-          email: "user@example.com", // Replace with the logged-in user's email
-          contact: "9999999999", // Replace with the logged-in user's contact
+          name: "User Name",
+          email: "user@example.com",
+          contact: "9999999999",
         },
         theme: {
           color: "#3399cc",
         },
       };
-  
+
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (error) {
       console.error("Error initiating payment:", error);
     }
   };
-  
+
+  const handleViewReviews = () => {
+    navigate(`/courses/${id}/reviews`);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -103,6 +107,10 @@ const CourseDetail = () => {
       </div>
     );
   }
+
+  const handleChatWithTutor = () => {
+    navigate(`/chat/${userId}/${tutorId}`);
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -127,7 +135,6 @@ const CourseDetail = () => {
                 className="w-full h-[400px] object-cover rounded-lg"
               />
               <h2 className="text-2xl font-bold mt-6 mb-3">{course.title}</h2>
-
               <p className="text-gray-600">{course.tag_line}</p>
               <div className="mt-4">
                 <span className="bg-blue-100 text-blue-800 text-sm px-4 py-1.5 rounded-full">
@@ -168,7 +175,7 @@ const CourseDetail = () => {
             </div>
 
             {/* Book Section */}
-            <div className="bg-white p-8 rounded-lg shadow-lg">
+            <div className="bg-white p-8 rounded-lg shadow-lg mt-8">
               <h3 className="text-2xl font-bold mb-4">ENROLL IN THIS COURSE</h3>
               {!isEnrolled ? (
                 <button
@@ -178,14 +185,21 @@ const CourseDetail = () => {
                   Enroll Now for ₹{course.price}
                 </button>
               ) : (
-                <Link 
-                to={`/courses/${course.id}/lessons`}
-                className="w-full bg-green-400 hover:bg-green-500 text-black font-bold py-3 px-6 rounded-lg transition duration-200"
-              >
-                <button className="w-full">Visit Lessons</button>
-              </Link>
-              
-              )}
+                <>
+                  <Link 
+                    to={`/courses/${course.id}/lessons`}
+                    className="block w-full bg-green-400 hover:bg-green-500 text-black font-bold py-3 px-6 rounded-lg transition duration-200 text-center mb-4"
+                  >
+                    Visit Lessons
+                  </Link>
+                  <div>
+          <h1>{course.title}</h1>
+          <div>
+      <button onClick={handleChatWithTutor}>Chat with Tutor</button>
+    </div>
+        </div>
+                </>
+              )}  
             </div>
 
             {/* What You'll Learn Section */}
@@ -194,12 +208,24 @@ const CourseDetail = () => {
               <ul className="space-y-3">
                 <LearningPoint text="Master the fundamentals and advanced concepts" />
                 <LearningPoint text="Build real-world projects for your portfolio" />
-                <LearningPoint text="Learn best practices and industry standards" />
+                <LearningPoint text="Learn best practices and industry standards" />  
                 <LearningPoint text="Gain practical skills for immediate application" />
               </ul>
             </div>
           </div>
         </div>
+
+        {/* View Reviews Button */}
+        {isEnrolled && (
+  <div className="mt-12">
+    <button
+      onClick={handleViewReviews}
+      className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition duration-200"
+    >
+      View Reviews
+    </button>
+  </div>
+)}
       </div>
     </div>
   );

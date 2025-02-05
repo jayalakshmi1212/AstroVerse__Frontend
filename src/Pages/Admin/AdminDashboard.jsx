@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link, useLocation } from 'react-router-dom';
 import { Bell, Calendar, ChevronRight, Home, Settings, User, Users,User2 ,Book} from 'lucide-react';
 import CategoryManagement from './Category/CategoryManagement';
+import LogoutButton from '../../Components/User/Login/LogoutButton';
+
 export const Sidebar = () => {
   const location = useLocation();
 
@@ -12,34 +14,43 @@ export const Sidebar = () => {
     { icon: <Book size={20} />, label: 'Course', path: '/admin/courselist' },
     { icon: <Calendar size={20} />, label: 'Category', path: '/admin/category' },
     { icon: <Settings size={20} />, label: 'Settings', path: '/settings' },
+    <LogoutButton className="text-white hover:text-blue-200 transition-colors duration-200">
+    Logout
+  </LogoutButton>
   ];
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200">
-      <div className="p-6">
-        <h2 className="text-xl font-bold flex items-center gap-2">
-          <span className="h-6 w-6 rounded-lg bg-purple-600"></span>
-          Dashboard
-        </h2>
+    <div className="p-6">
+      <h2 className="text-xl font-bold flex items-center gap-2">
+        <span className="h-6 w-6 rounded-lg bg-purple-600"></span>
+        Dashboard
+      </h2>
+    </div>
+    <nav className="px-4 space-y-2">
+      {navItems.map((item, index) => (
+        <Link
+          key={index}
+          to={item.path}
+          className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm ${
+            location.pathname === item.path
+              ? 'bg-purple-50 text-purple-600'
+              : 'text-gray-600 hover:bg-gray-50'
+          }`}
+        >
+          {item.icon}
+          {item.label}
+        </Link>
+      ))}
+      {/* Logout Button */}
+      <div className="px-4 py-3 mt-4">
+        <LogoutButton className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+          Logout
+        </LogoutButton>
       </div>
-      <nav className="px-4 space-y-2">
-        {navItems.map((item, index) => (
-          <Link
-            key={index}
-            to={item.path}
-            className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm ${
-              location.pathname === item.path
-                ? 'bg-purple-50 text-purple-600'
-                : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            {item.icon}
-            {item.label}
-          </Link>
-        ))}
-      </nav>
-    </aside>
-  );
+    </nav>
+  </aside>
+);
 };
 
 export const Header = () => (

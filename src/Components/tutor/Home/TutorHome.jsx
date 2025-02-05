@@ -82,13 +82,14 @@ function TutorHome() {
             <ChevronRight className="h-5 w-5 text-gray-400" />
           </Link>
 
-          <Link to="/notifications" className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-150 ease-in-out">
-            <div className="flex items-center">
-              <Bell className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mr-3" />
-              <span className="text-lg font-medium text-gray-800 dark:text-white">Notifications</span>
-            </div>
-            <ChevronRight className="h-5 w-5 text-gray-400" />
-          </Link>
+          <Link to="/tutor/reviews" className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-150 ease-in-out">
+    <div className="flex items-center">
+        <Bell className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mr-3" />
+        <span className="text-lg font-medium text-gray-800 dark:text-white">Reviews</span>
+    </div>
+    <ChevronRight className="h-5 w-5 text-gray-400" />
+</Link>
+
         </div>
       </main>
     </div>

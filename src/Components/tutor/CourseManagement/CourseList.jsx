@@ -13,8 +13,9 @@ export default function CourseList() {
     const fetchCourses = async () => {
       setLoading(true);
       try {
-        const response = await axios.get("http://localhost:8000/courses/");
-        setCourses(response.data);
+        const response = await axios.get("http://localhost:8000/api/courses/");
+        setCourses(response.data.courses);
+        console.log(response.data)
       } catch (err) {
         setError("Failed to fetch courses. Please try again.");
       } finally {
