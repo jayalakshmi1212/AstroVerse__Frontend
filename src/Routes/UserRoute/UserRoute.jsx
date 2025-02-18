@@ -28,9 +28,10 @@ function UserRoute() {
         <Route path="/courses/:id" element={<CourseDetail />} />
         <Route path="/courses/:courseId/lessons" element={<LessonList />} />
 
-        <Route path="/chat/:tutorId" element={<ChatPage />} />
+        {/* <Route path="/chat/:tutorId" element={<ChatPage />} /> */}
         <Route path="/courses/:courseId/reviews" element={<CourseReviewPage />} />
-        <Route path="/chat/:tutorId" element={ChatWithProvider} />
+        {/* <Route path="/chat/:tutorId" element={ChatWithProvider} /> */}
+        
       </Routes>
       <Footer />
     </div>

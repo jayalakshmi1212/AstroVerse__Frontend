@@ -11,6 +11,7 @@ import AdminRoute from "./Routes/AdminRoute/AdminRoute";
 import LandingPage from "./Components/landingpage";
 import ChatComponent from "./Components/User/Chat/Chat";
 import ChatListComponent from "./Components/User/Chat/ChatListComponent";
+import VideoCall from "./Components/User/Video-chat/video-call";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
           {/* <Route path="/" element={<LandingPage />} /> */}
           
           <Route path="/chat/:senderId/:recipientId" element={<ChatComponent />} />
+          <Route path="/video/:senderId/:recipientId" element={<VideoCall />} />
           <Route path="/chats" element={<ChatListComponent />} />
 
         

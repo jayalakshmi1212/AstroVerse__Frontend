@@ -14,11 +14,12 @@ export default function TutorList() {
 
   useEffect(() => {
     const fetchTutors = async () => {
+      
       try {
         setLoading(true);
         const response = await fetch('http://127.0.0.1:8000/api/tutors/', {
           headers: {
-            Authorization: 'Token your-auth-token', // Replace with actual token
+            Authorization: 'Token 7dc953883b5c85e048b32601446d367cb758989b', // Replace with actual token
           },
         });
 
@@ -28,6 +29,7 @@ export default function TutorList() {
 
         const data = await response.json();
         setTutors(data.tutors);
+        console.log("Fetched tutors:", data.tutors);
       } catch (error) {
         setError('Failed to fetch tutors. Please try again.');
       } finally {
@@ -82,7 +84,9 @@ export default function TutorList() {
       setTutors((prevTutors) =>
         prevTutors.map((tutor) =>
           tutor.id === selectedTutorId ? { ...tutor, status: 'rejected' } : tutor
+      
         )
+        
       );
       closeModal();
     } catch (error) {
@@ -90,9 +94,9 @@ export default function TutorList() {
     }
   };
 
-  const openModal = (document, tutorId) => {
-    console.log("Opening modal for document:", document);
-    setSelectedDocument(document);
+  const openModal = (document_tutor, tutorId) => {
+    console.log("Opening modal for document:",tutorId,document_tutor);
+    setSelectedDocument(document_tutor);
     setSelectedTutorId(tutorId);
   };
   
@@ -153,7 +157,8 @@ export default function TutorList() {
                   <td className="px-6 py-4 whitespace-nowrap">{tutor.email}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
-                      onClick={() => openModal(tutor.document, tutor.id)}
+                      onClick={() => openModal(tutor.document_tutor, tutor.id)}
+                      
                       className="text-blue-600 hover:text-blue-800 font-medium"
                     >
                       View Document
@@ -202,7 +207,14 @@ export default function TutorList() {
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
             <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
               <h2 className="text-2xl font-bold mb-4">Document Details</h2>
-              <p className="text-gray-700 mb-6">{selectedDocument}</p>
+              {selectedDocument && (
+              <iframe
+                src={selectedDocument}
+                className="w-full h-96 border"
+                title="Document Viewer"
+              />
+            )}
+
               <div className="flex justify-end space-x-2">
                 <button
                   onClick={handleApproveDocument}

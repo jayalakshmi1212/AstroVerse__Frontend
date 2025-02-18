@@ -115,7 +115,6 @@ const CourseDetail = () => {
   return (
     <div className="min-h-screen bg-white">
       <Toaster position="top-center" />
-      {/* Hero Section */}
       <div className="relative h-[300px] bg-blue-600">
         <div className="absolute inset-0 bg-black/40"></div>
         <div className="absolute inset-0 flex items-center justify-center">
@@ -123,10 +122,9 @@ const CourseDetail = () => {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid md:grid-cols-2 gap-8 items-start">
-          {/* Left Column - Main Image and Course Overview */}
+         
           <div className="space-y-6">
             <div className="bg-white p-6 rounded-lg shadow-lg">
               <img
@@ -143,7 +141,7 @@ const CourseDetail = () => {
               </div>
             </div>
             
-            {/* Course Overview Section */}
+     
             <div className="bg-white p-6 rounded-lg shadow-lg">
               <h3 className="text-xl font-bold mb-4">Course Overview</h3>
               <p className="text-gray-600 mb-4">
